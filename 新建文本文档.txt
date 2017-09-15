@@ -1,0 +1,178 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#define MAX 100
+void simple(int &m,int &n) //约去分子分母公约数
+{
+int p;
+p=(m+n-abs(m-n))/2;
+for(int i=2;i<=p;i++)
+if(m%i==0&&n%i==0)
+{
+m/=i;
+n/=i;
+i=2;
+}
+}
+
+void show(int &x,int &y) //输出整数或分数
+{
+if(x%y==0)
+printf("%d",x/y);
+else
+printf("%d/%d",x,y);
+}
+
+static int number=0;
+void judge(int p,int q,int f,int g) //判断输入结果的对错
+{
+if(p==f&&q==g)
+{
+printf("right!\n");
+number+=1;
+}
+else
+printf("wrong!\n");
+}
+
+int main()
+{
+FILE *fp;
+//文件的打开
+if((fp=fopen("mytiku.txt","w"))==NULL)
+{?
+printf("Cannot open this file!\n");
+exit(0);
+}
+for(int i=0;i<MAX;i++)?
+{
+int a,b,c,d,e,f,g,p,q,x,y;?
+int *A=(int *)malloc(MAX*sizeof(int)),*B=(int *)malloc(MAX*sizeof(int));
+int *C=(int *)malloc(MAX*sizeof(int)),*D=(int *)malloc(MAX*sizeof(int));
+a=rand()%MAX+1;
+b=rand()%MAX+1;
+c=rand()%MAX+1;
+d=rand()%MAX+1;
+e=rand()%4+1;
+simple(a,c);
+simple(b,d);
+A[i]=a;
+B[i]=b;
+C[i]=c;
+D[i]=d;
+
+//保证没有重复的题目
+for(int j=0;j<i;j++)?
+if((A[i]==A[j]&&B[i]==B[j]&&C[i]==C[j]&&D[i]==D[j])||(A[i]==B[j]&&B[i]==A[j])&&C[i]==D[j]&&D[i]==C[j])
+{
+a=rand()%MAX+1;
+b=rand()%MAX+1;
+c=rand()%MAX+1;
+d=rand()%MAX+1;
+simple(a,c);
+simple(b,d);
+j=0;
+}
+
+//显示产生的算式
+show(a,c);
+switch(e)?
+{
+case 1: printf("+");break;
+case 2: printf("-");break;
+case 3: printf("*");break;
+case 4: printf("/");break;
+}
+show(b,d);
+printf("=");
+
+//对结果进行判断
+switch(e)
+{
+case 1: f=a*d+b*c;
+g=c*d;
+simple(f,g);
+if(g!=1)
+{
+scanf("%d/%d",&p,&q);
+simple(p,q);
+judge(p,q,f,g);
+}
+else
+{
+scanf("%d",&p);
+judge(p,1,f,1);
+}
+fprintf(fp,"%d/%d+%d/%d=%d/%d\n",a,c,b,d,f,g);break;
+//减法可能产生负数，要对其进行判断
+case 2: f=abs(a*d-b*c);
+g=c*d;
+x=a*d;
+y=b*c;
+simple(f,g);
+if(x>=y)
+{
+if(g!=1)
+{
+scanf("%d/%d",&p,&q);
+simple(p,q);
+judge(p,q,f,g);
+}
+else
+{
+scanf("-%d",&p);
+judge(p,1,f,1);
+}
+fprintf(fp,"%d/%d-%d/%d=%d/%d\n",a,c,b,d,f,g);
+}
+else
+{
+if(g!=1)
+{
+scanf("-%d/%d",&p,&q);
+simple(p,q);
+judge(p,q,f,g);
+}
+else
+{
+scanf("%d",&p);
+judge(p,1,f,1);
+}
+fprintf(fp,"%d/%d-%d/%d=-%d/%d\n",a,c,b,d,f,g);
+}break;
+case 3: f=a*b;
+g=c*d;
+simple(f,g);
+if(g!=1)
+{
+scanf("%d/%d",&p,&q);
+simple(p,q);
+judge(p,q,f,g);
+}
+else
+{
+scanf("%d",&p);
+judge(p,1,f,1);
+}
+fprintf(fp,"%d/%d*%d/%d=%d/%d\n",a,c,b,d,f,g);break;
+case 4: f=a*d;
+g=b*c;
+simple(f,g);
+if(g!=1)
+{
+scanf("%d/%d",&p,&q);
+simple(p,q);
+judge(p,q,f,g);
+}
+else
+{
+scanf("%d",&p);
+judge(p,1,f,1);
+}
+fprintf(fp,"%d/%d/%d/%d=%d/%d\n",a,c,b,d,f,g);break;
+}
+}
+fprintf(fp,"做对题目的数目为%d\n",number);
+fclose(fp);
+return 0;
+}
